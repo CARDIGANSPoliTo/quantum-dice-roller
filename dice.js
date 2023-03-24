@@ -139,8 +139,6 @@
 
     this.standart_d20_dice_face_labels = [' ', '0', '1', '2', '3', '4', '5', '6', '7', '8',
             '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
-    this.standart_d100_dice_face_labels = [' ', '00', '10', '20', '30', '40', '50',
-            '60', '70', '80', '90'];
 
     function calc_texture_size(approx) {
         return Math.pow(2, Math.floor(Math.log(approx) / Math.log(2)));
@@ -283,11 +281,11 @@
     this.desk_color = 0xdfdfdf;
     this.use_shadows = true;
 
-    this.known_types = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'];
+    this.known_types = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
     this.dice_face_range = { 'd4': [1, 4], 'd6': [1, 6], 'd8': [1, 8], 'd10': [0, 9], 
-        'd12': [1, 12], 'd20': [1, 20], 'd100': [0, 9] };
-    this.dice_mass = { 'd4': 300, 'd6': 300, 'd8': 340, 'd10': 350, 'd12': 350, 'd20': 400, 'd100': 350 };
-    this.dice_inertia = { 'd4': 5, 'd6': 13, 'd8': 10, 'd10': 9, 'd12': 8, 'd20': 6, 'd100': 9 };
+        'd12': [1, 12], 'd20': [1, 20]};
+    this.dice_mass = { 'd4': 300, 'd6': 300, 'd8': 340, 'd10': 350, 'd12': 350, 'd20': 400};
+    this.dice_inertia = { 'd4': 5, 'd6': 13, 'd8': 10, 'd10': 9, 'd12': 8, 'd20': 6};
 
     this.scale = 50;
 
@@ -331,13 +329,6 @@
         if (!this.dice_material) this.dice_material = new THREE.MeshFaceMaterial(
                 this.create_dice_materials(this.standart_d20_dice_face_labels, this.scale / 2, 1.0));
         return new THREE.Mesh(this.d20_geometry, this.dice_material);
-    }
-
-    this.create_d100 = function() {
-        if (!this.d10_geometry) this.d10_geometry = this.create_d10_geometry(this.scale * 0.9);
-        if (!this.d100_material) this.d100_material = new THREE.MeshFaceMaterial(
-                this.create_dice_materials(this.standart_d100_dice_face_labels, this.scale / 2, 1.5));
-        return new THREE.Mesh(this.d10_geometry, this.d100_material);
     }
 
     this.parse_notation = function(notation) {
@@ -584,8 +575,7 @@
             }
         }
         var matindex = closest_face.materialIndex - 1;
-        if (dice.dice_type == 'd100') matindex *= 10;
-        if (dice.dice_type == 'd10' && matindex == 0) matindex = 10;
+        // if (dice.dice_type == 'd10' && matindex == 0) matindex = 10;
         return matindex;
     }
 
@@ -734,7 +724,7 @@
 
     this.dice_box.prototype.draw_selector = function() {
         this.clear();
-        var step = this.w / 4.5;
+        var step = this.w / 3.5;
         this.pane = new THREE.Mesh(new THREE.PlaneGeometry(this.w * 6, this.h * 6, 1, 1), 
                 new THREE.MeshPhongMaterial(that.selector_back_colors));
         this.pane.receiveShadow = true;
@@ -743,7 +733,7 @@
 
         var mouse_captured = false;
 
-        for (var i = 0, pos = -3; i < that.known_types.length; ++i, ++pos) {
+        for (var i = 0, pos = -2.5; i < that.known_types.length; ++i, ++pos) {
             var dice = $t.dice['create_' + that.known_types[i]]();
             dice.position.set(pos * step, 0, step * 0.5);
             dice.castShadow = true;

@@ -10,6 +10,7 @@ function dice_initialize(container) {
     var set = $t.id('set');
     var selector_div = $t.id('selector_div');
     var info_div = $t.id('info_div');
+    var waiting_div = $t.id('waiting_div');
     on_set_change();
 
     $t.dice.use_true_random = false;
@@ -69,15 +70,6 @@ function dice_initialize(container) {
         default:
             break;
     }
-    
-    /*if (params.color == 'white') {
-        $t.dice.dice_color = '#808080';
-        $t.dice.label_color = '#202020';
-    }
-    if (params.color == 'blue') {
-        $t.dice.dice_color = '#1883db';
-        $t.dice.label_color = '#202020';
-    }*/
 
     var box = new $t.dice.dice_box(canvas, { w: 500, h: 300 });
     box.animate_selector = false;
@@ -97,10 +89,43 @@ function dice_initialize(container) {
     function before_roll(vectors, notation, callback) {
         info_div.style.display = 'none';
         selector_div.style.display = 'none';
-        // do here rpc call or whatever to get your own result of throw.
-        // then callback with array of your result, example:
-        // callback([2, 2, 2, 2]); // for 4d6 where all dice values are 2.
-        callback();
+        canvas.style.display = 'none';
+        waiting_div.style.display = 'block';
+        
+        // console.log(notation.set[0])
+        
+        var res;
+        fetch('/dice/f', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                data: notation.set
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data =>  {
+            res = data;
+            // console.log(res)
+        })
+        .then(() =>  {
+            // console.log(res)
+            // console.log(res.number)
+            // do here rpc call or whatever to get your own result of throw.
+            // then callback with array of your result, example:
+            waiting_div.style.display = 'none';
+            canvas.style.display = 'inline-block';
+            callback(res.number);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
     }
 
     function notation_getter() {

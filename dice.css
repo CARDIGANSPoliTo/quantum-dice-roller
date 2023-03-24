@@ -5,6 +5,14 @@
     width: 100%;
 }
 
+.center_field_loader {
+    position: absolute;
+    text-align: center;
+    height: 40%;
+    width: 100%;
+    top: 30%;
+}
+
 .center_field * {
     position: relative;
     font-family: Trebuchet MS;
